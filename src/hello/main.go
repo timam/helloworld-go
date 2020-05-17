@@ -4,7 +4,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"net/http"
-	Logger "github.com/SamsadSajid/helloworld-go/src/logger"
+	Logger "logger"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
