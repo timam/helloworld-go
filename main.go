@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/timam/helloworld-go/logger"
 	"net/http"
 )
@@ -19,7 +20,8 @@ func colorAndMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(data)
-	logger.Log.Printf("SUCCESS")
+	logger.Log.Printf("SUCCESS | Type - File")
+	fmt.Println("SUCCESS | Type - Console ")
 }
 
 func main() {
