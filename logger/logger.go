@@ -13,7 +13,7 @@ var (
 
 func init() {
 	// set location of log file build.Default.GOPATH + "hello.log"
-	var logpath = "helloworld-go.log"
+	var logpath = "/log/helloworld-go.log"
 
 	flag.Parse()
 	var file, err1 = os.Create(logpath)
