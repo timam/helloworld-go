@@ -6,6 +6,6 @@ COPY . /go/src/
 WORKDIR /go/src
 RUN CGO_ENABLED=0 go build -o /bin/helloworld-go
 
-FROM scratch
+FROM ubuntu:18.04
 COPY --from=build /bin/helloworld-go /bin/helloworld-go
 ENTRYPOINT ["/bin/helloworld-go"]
