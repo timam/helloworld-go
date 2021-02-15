@@ -21,6 +21,6 @@ func init() {
 	if err1 != nil {
 		panic(err1)
 	}
-	Log = log.New(file, "", log.LstdFlags|log.Lshortfile)
+	Log = log.New(file, "", log.Ldate | log.Ltime )
 	Log.Println("LogFile : " + logpath)
 }
