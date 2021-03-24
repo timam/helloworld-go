@@ -11,7 +11,7 @@ import (
 
 var method = "GET"
 var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health"
-var serviceName = "test"
+var serviceName = "1test"
 
 func gimmeResponse(method, endpoint string) (int, string) {
 
@@ -67,9 +67,9 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 func main() {
 	statusCode, body := gimmeResponse(method, endpoint)
 
-	var up = 1.0
-
-	putStatusCodeToCloudwatch(up, serviceName)
+	var statusUp float64
+	statusUp = 1.0
+	putStatusCodeToCloudwatch(statusUp, serviceName)
 
 	fmt.Println(statusCode, body)
 }
