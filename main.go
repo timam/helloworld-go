@@ -38,7 +38,7 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 	// Create new cloudwatch client.
 	svc := cloudwatch.New(sess)
 
-	_, err := svc.PutMetricData(&cloudwatch.PutMetricDataInput{
+	_, _ = svc.PutMetricData(&cloudwatch.PutMetricDataInput{
 		Namespace: aws.String("EKS-UPTIME"),
 		MetricData: []*cloudwatch.MetricDatum{
 			&cloudwatch.MetricDatum{
