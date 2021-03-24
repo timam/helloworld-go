@@ -6,12 +6,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strconv"
 )
+
+const statusUp  = 1.0
+const statusDown = 0.0
 
 var method = "GET"
 var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health"
-var serviceName = "1test"
+var serviceName = "2test"
 
 func gimmeResponse(method, endpoint string) (int, string) {
 
@@ -30,7 +35,7 @@ func gimmeResponse(method, endpoint string) (int, string) {
 	return response.StatusCode, string(body)
 }
 
-func putStatusCodeToCloudwatch(status float64, serviceName string) {
+func putStatusCodeToCloudwatch(status float64, serviceName string, httpStatus string) {
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -49,11 +54,11 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 				Dimensions: []*cloudwatch.Dimension{
 					&cloudwatch.Dimension{
 						Name:  aws.String("ServiceName"),
-						Value: aws.String(string(serviceName)),
+						Value: aws.String(serviceName),
 					},
 					&cloudwatch.Dimension{
-						Name:  aws.String("ServiceName2"),
-						Value: aws.String(string(serviceName)),
+						Name:  aws.String("StatusCode"),
+						Value: aws.String(httpStatus),
 					},
 				},
 			},
@@ -70,10 +75,13 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 
 func main() {
 	statusCode, body := gimmeResponse(method, endpoint)
+	strStatusCode := strconv.Itoa(statusCode)
 
-	var statusUp float64
-	statusUp = 1.0
-	putStatusCodeToCloudwatch(statusUp, serviceName)
-
-	fmt.Println(statusCode, body)
+	if statusCode == 200{
+		putStatusCodeToCloudwatch(statusUp, serviceName, strStatusCode)
+		log.Println(fmt.Sprintf("%s is: up, status code:  %s, body: %s", serviceName, strStatusCode, body))
+	} else {
+		putStatusCodeToCloudwatch(statusDown, serviceName, strStatusCode)
+		log.Println(fmt.Sprintf("%s is: error, status code:  %s, body: %s", serviceName, strStatusCode, body))
+	}
 }
