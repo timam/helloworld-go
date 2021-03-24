@@ -11,6 +11,7 @@ import (
 
 var method = "GET"
 var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health"
+var serviceName = "test"
 
 func gimmeResponse(method, endpoint string) (int, string) {
 
@@ -38,7 +39,7 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 	// Create new cloudwatch client.
 	svc := cloudwatch.New(sess)
 
-	myput, err := svc.PutMetricData(&cloudwatch.PutMetricDataInput{
+	_, err := svc.PutMetricData(&cloudwatch.PutMetricDataInput{
 		Namespace: aws.String("EKS-UPTIME"),
 		MetricData: []*cloudwatch.MetricDatum{
 			&cloudwatch.MetricDatum{
@@ -57,11 +58,7 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 
 	if err != nil{
 		fmt.Println("Cloudwatch Put Error :", err)
-	} else {
-		fmt.Println(myput)
 	}
-
-
 
 }
 
@@ -72,8 +69,7 @@ func main() {
 
 	var up = 1.0
 
-	if statusCode == 200 {
-		putStatusCodeToCloudwatch(up, "test")
-	}
+	putStatusCodeToCloudwatch(up, serviceName)
+
 	fmt.Println(statusCode, body)
 }
