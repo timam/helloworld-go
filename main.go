@@ -51,6 +51,10 @@ func putStatusCodeToCloudwatch(status float64, serviceName string) {
 						Name:  aws.String("ServiceName"),
 						Value: aws.String(string(serviceName)),
 					},
+					&cloudwatch.Dimension{
+						Name:  aws.String("ServiceName2"),
+						Value: aws.String(string(serviceName)),
+					},
 				},
 			},
 		},
