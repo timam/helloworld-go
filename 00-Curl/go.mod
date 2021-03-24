@@ -1,4 +1,4 @@
-module github.com/timam/helloworld-go
+module github.com/timam/healthchecker
 
 go 1.15
 

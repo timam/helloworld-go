@@ -1,32 +1,72 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/timam/helloworld-go/logger"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
+	"io/ioutil"
 	"net/http"
 )
 
-type SomeStruct struct {
-	Color	string	`json:"color"`
-	Message string 	`json:"message"`
-}
+var method = "GET"
+var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health"
 
-var log = "| http-nio-8080-exec-6 |  INFO | c.b.a.common.aspect.AccessLoggingAspect  |  2029311C58041113 | REST request on com.bkash.autobot.gateway.controller.IntentController.create() with [IntentDto.CreateIntentDto(super=IntentDto(invoice=31f143a76866402981, type=SUBSCRIPTION, subscriptionData=SubscriptionData(amount=15.0, cycle=WEEKLY, serviceReference=MM_CONTEST_15TK_1W, merchantReference=MoMAGIC)))]"
+func gimmeResponse(method, endpoint string) (int, string) {
 
-func colorAndMessage(w http.ResponseWriter, r *http.Request) {
-	data := SomeStruct{
-		Color: "#fc5c65", //FUSION RED
-		Message: "kubernetes is awesome",
+	request, err := http.NewRequest(method, endpoint, nil)
+	if err != nil {
+		fmt.Println("Request Error :", err)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(data)
-	logger.Log.Printf(log)
-	fmt.Println(log)
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		print("Response Error", err)
+	}
+
+	body, _ := ioutil.ReadAll(response.Body)
+	return response.StatusCode, string(body)
 }
+
+func putStatusCodeToCloudwatch(status float64, serviceName string) {
+
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	// Create new cloudwatch client.
+	svc := cloudwatch.New(sess)
+
+	_, err := svc.PutMetricData(&cloudwatch.PutMetricDataInput{
+		Namespace: aws.String("EKS-UPTIME"),
+		MetricData: []*cloudwatch.MetricDatum{
+			&cloudwatch.MetricDatum{
+				MetricName: aws.String("Status"),
+				Unit:       aws.String("Count"),
+				Value:      aws.Float64(status),
+				Dimensions: []*cloudwatch.Dimension{
+					&cloudwatch.Dimension{
+						Name:  aws.String("ServiceName"),
+						Value: aws.String(string(serviceName)),
+					},
+				},
+			},
+		},
+	})
+
+
+}
+
+
 
 func main() {
-	http.HandleFunc("/", colorAndMessage)
-	http.ListenAndServe(":8080", nil)
+	statusCode, body := gimmeResponse(method, endpoint)
+
+	var up = 1.0
+
+	if statusCode == 200 {
+		putStatusCodeToCloudwatch(up, "test")
+	}
+	fmt.Println(statusCode, body)
 }

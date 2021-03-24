@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
 )
 
 var method = "GET"
@@ -24,6 +27,18 @@ func gimmeResponse(method, endpoint string) (int, string) {
 
 	body, _ := ioutil.ReadAll(response.Body)
 	return response.StatusCode, string(body)
+}
+
+func putStatusCodeToCloudwatch(statusCode int)  {
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	// Create new cloudwatch client.
+	svc := cloudwatch.New(sess)
+
+	_ := svc
+
 }
 
 func main() {
