@@ -16,6 +16,11 @@ import (
 const statusUp  = 1.0
 const statusDown = 0.0
 
+//https://admin.uatsm.bka.sh/admin/actuator/health
+//https://callback.uatsm.bka.sh/cps/actuator/health
+//https://callback.uatsm.bka.sh/processor/actuator/health/
+//https://admin-app.uatsm.bka.sh/admin-app/actuator/health
+
 var method = "GET"
 var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health/"
 var serviceName = "mysteram"
