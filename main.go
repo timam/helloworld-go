@@ -9,14 +9,17 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
+
 
 const statusUp  = 1.0
 const statusDown = 0.0
 
 var method = "GET"
-var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health"
-var serviceName = "2test"
+var endpoint = "https://eventstream.uatcapp.bka.sh/event-stream/actuator/health/"
+var serviceName = "mysteram"
+
 
 func gimmeResponse(method, endpoint string) (int, string) {
 
@@ -72,16 +75,20 @@ func putStatusCodeToCloudwatch(status float64, serviceName string, httpStatus st
 }
 
 
-
 func main() {
-	statusCode, body := gimmeResponse(method, endpoint)
-	strStatusCode := strconv.Itoa(statusCode)
 
-	if statusCode == 200{
-		putStatusCodeToCloudwatch(statusUp, serviceName, strStatusCode)
-		log.Println(fmt.Sprintf("%s is: up, status code:  %s, body: %s", serviceName, strStatusCode, body))
-	} else {
-		putStatusCodeToCloudwatch(statusDown, serviceName, strStatusCode)
-		log.Println(fmt.Sprintf("%s is: error, status code:  %s, body: %s", serviceName, strStatusCode, body))
+	for {
+		statusCode, body := gimmeResponse(method, endpoint)
+		strStatusCode := strconv.Itoa(statusCode)
+
+		if statusCode == 200{
+			putStatusCodeToCloudwatch(statusUp, serviceName, strStatusCode)
+			log.Println(fmt.Sprintf("%s is: up, status code:  %s, body: %s", serviceName, strStatusCode, body))
+		} else {
+			putStatusCodeToCloudwatch(statusDown, serviceName, strStatusCode)
+			log.Println(fmt.Sprintf("%s is: unhealthy, status code:  %s", serviceName, strStatusCode))
+		}
+		time.Sleep(1000 *time.Millisecond)
 	}
+
 }
