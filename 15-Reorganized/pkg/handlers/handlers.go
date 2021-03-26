@@ -1,13 +1,14 @@
-package main
+package handlers
 
 import (
+	"github.com/timam/go-mod/pkg/render"
 	"net/http"
 )
 
 func Home(w http.ResponseWriter, r *http.Request)  {
-	renderTemplate(w, "home.page.gohtml")
+	render.RenderTemplate(w, "home.page.gohtml")
 }
 
 func About(w http.ResponseWriter, r *http.Request)  {
-	renderTemplate(w, "about.page.gohtml")
+	render.RenderTemplate(w, "about.page.gohtml")
 }
